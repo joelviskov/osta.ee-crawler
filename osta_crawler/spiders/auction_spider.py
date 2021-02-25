@@ -1,17 +1,41 @@
-from osta_crawler.items import OstaCrawlerItem
+from osta_crawler.items import AuctionItem
 import scrapy
 import re
 import datetime
-from scrapy.crawler import CrawlerProcess
-from scrapy.utils.project import get_project_settings
+import logging
+from scrapy.utils.log import configure_logging
 
 
-class SpiderSpider(scrapy.Spider):
-    name = 'spider'
+class AuctionSpider(scrapy.Spider):
+    name = 'auction_spider'
     allowed_domains = ['osta.ee']
     start_urls = [
-        'https://www.osta.ee/kategooria/audiovideo/mangukonsoolid/konsoolid'
+        #'https://www.osta.ee/kategooria/audiovideo/mangukonsoolid?pagesize=180&q%5Bshow_items%5D=1',
+        'https://www.osta.ee/kategooria/arvutid/komponendid/video-vorgu-ja-helikaardid?pagesize=180&q%5Bshow_items%5D=1'
     ]
+
+    custom_settings = {
+        "FEEDS": {
+            'auctions.json': {
+                'format': 'jsonlines',
+                'encoding': 'utf8',
+                'store_empty': False,
+                'fields': None,
+                'indent': 4,
+                'item_export_kwargs': {
+                    'export_empty_fields': True,
+                },
+            }
+        }
+    }
+
+    configure_logging(install_root_handler=False)
+    logging.basicConfig(
+        filename='log.txt',
+        format='%(levelname)s: %(message)s',
+        level=logging.INFO,
+        filemode='w'
+    )
 
     def get_date(self, extract):
         regex = re.search(
@@ -34,6 +58,11 @@ class SpiderSpider(scrapy.Spider):
                 # We prefer only auctions.
                 return
 
+            breadcrumbs = response.css(
+                'div.breadcrumb-item a span::text').getall()
+            # First is "Kõik kategooriad" which we will not need.
+            breadcrumbs.pop(0)
+
             link = response.request.url
 
             extracted_price_now = response.css(
@@ -53,29 +82,34 @@ class SpiderSpider(scrapy.Spider):
             extracted_end = response.css('span.js-date-end::text').get()
             end_date = self.get_date(extracted_end)
 
-            yield OstaCrawlerItem(
+            yield AuctionItem(
                 id=re.search('-(\d+).html$', link).group(1),
                 name=response.css(
                     'div.header__title-block h1.header-title::text').get(),
+                description=response.css(
+                    'div.offer-details__description').get(),
                 link=link,
                 price_now=price_now,
                 price_buy=price_buy,
                 bids=int(bids),
-                category=response.css(
-                    'div.breadcrumb span.active::text').get(),
+                category='_'.join(breadcrumbs),
                 views=int(response.css('table.data-list')
                           [1].css('tr td::text').getall()[2]),
                 start_date=start_date,
                 end_date=end_date
             )
-        except:
-            f = open("errors.txt", "a")
-            f.write(f'Failed on {response.request.url}.\n')
-            f.close()
+        except BaseException as exception:
+            logging.critical(
+                f'Failed to parse {response.request.url}.\n{exception.__doc__}')
 
     def parse(self, response):
+        logging.info(f'Scraping {response.request.url}')
+
         # Loop through auctions on the page and parse them.
-        auction_anchors = response.css('h3.offer-thumb__title a')
+        auction_anchors = response.css(
+            'ul.offers-list h3.offer-thumb__title a')
+        logging.info(
+            f'Found {len(auction_anchors)} auctions to follow on this page.')
         yield from response.follow_all(auction_anchors, callback=self.parse_auction)
 
         navigation_anchors = response.css('div.page-selector a')

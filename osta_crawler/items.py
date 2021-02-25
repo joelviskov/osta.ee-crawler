@@ -7,7 +7,7 @@ import scrapy
 from scrapy.item import Field
 
 
-class OstaCrawlerItem(scrapy.Item):
+class AuctionItem(scrapy.Item):
     id = Field()
     name = Field()
     link = Field()
@@ -18,3 +18,9 @@ class OstaCrawlerItem(scrapy.Item):
     views = Field()
     start_date = Field()
     end_date = Field()
+    description = Field()
+
+class CategoryItem(scrapy.Item):
+    id = Field()
+    name = Field()
+    parent_id = Field()

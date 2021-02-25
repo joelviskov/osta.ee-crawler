@@ -44,9 +44,9 @@ ROBOTSTXT_OBEY = True
 
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
-SPIDER_MIDDLEWARES = {
-    'osta_crawler.middlewares.OstaCrawlerSpiderMiddleware': 543,
-}
+#SPIDER_MIDDLEWARES = {
+#    'osta_crawler.middlewares.OstaCrawlerSpiderMiddleware': 543,
+#}
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
@@ -87,17 +87,6 @@ SPIDER_MIDDLEWARES = {
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
-FEEDS = {
-    'items.json': {
-        'format': 'jsonlines',
-        'encoding': 'utf8',
-        'store_empty': False,
-        'fields': None,
-        'indent': 4,
-        'item_export_kwargs': {
-           'export_empty_fields': True,
-        },
-    }
-}
+
 
 LOG_LEVEL = 'INFO'
