@@ -4,3 +4,5 @@ errors.txt
 categories.json
 auctions.json
 log.txt
+build
+project.egg-info

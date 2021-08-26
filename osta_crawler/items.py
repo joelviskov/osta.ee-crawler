@@ -4,23 +4,21 @@
 # https://docs.scrapy.org/en/latest/topics/items.html
 
 import scrapy
-from scrapy.item import Field
-
 
 class AuctionItem(scrapy.Item):
-    id = Field()
-    name = Field()
-    link = Field()
-    price_now = Field()
-    price_buy = Field()
-    bids = Field()
-    category = Field()
-    views = Field()
-    start_date = Field()
-    end_date = Field()
-    description = Field()
+    id = scrapy.Field()
+    name = scrapy.Field()
+    link = scrapy.Field()
+    price_now = scrapy.Field()
+    price_buy = scrapy.Field()
+    bids = scrapy.Field()
+    category = scrapy.Field()
+    views = scrapy.Field()
+    start_date = scrapy.Field()
+    end_date = scrapy.Field()
+    description = scrapy.Field()
 
 class CategoryItem(scrapy.Item):
-    id = Field()
-    name = Field()
-    parent_id = Field()
+    id = scrapy.Field()
+    name = scrapy.Field()
+    parent_id = scrapy.Field()
