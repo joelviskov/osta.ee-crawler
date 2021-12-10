@@ -33,7 +33,6 @@ class OstaCrawlerSpiderMiddleware:
         # it has processed the response.
 
         # Must return an iterable of Request, or item objects.
-
         for i in result:
             yield i
 

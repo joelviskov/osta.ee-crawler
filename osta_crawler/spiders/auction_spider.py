@@ -11,6 +11,9 @@ class AuctionSpider(scrapy.Spider):
     allowed_domains = ["osta.ee"]
     start_urls = [
         "https://www.osta.ee/kategooria/audiovideo/mangukonsoolid?pagesize=180&q%5Bshow_items%5D=1",
+        #"https://www.osta.ee/kategooria/audiovideo?pagesize=180&q%5Bshow_items%5D=1",
+        #"https://www.osta.ee/kategooria/arvutid?pagesize=180&q%5Bshow_items%5D=1",
+        #"https://www.osta.ee/kategooria/raamatud-ajalehed/arvutid-ja-infotehnoloogia?pagesize=180&q%5Bshow_items%5D=1"
     ]
 
     custom_settings = {
@@ -47,6 +50,7 @@ class AuctionSpider(scrapy.Spider):
         try:
             bids = response.css("span.js-current-bids::text").get()
             if bids is None:
+                logging.debug(f"Skipping {response.request.url} - not an auction.")
                 return  # We prefer only auctions.
 
             link = response.request.url
